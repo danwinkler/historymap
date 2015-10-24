@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hey</title>
+        <link href="http://openlayers.org/en/v3.10.1/css/ol.css" rel="stylesheet">
+        <link href="static/vis/dist/vis.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div style="height: 500px" id="map"></div>
+
+        <div id="visualization"></div>
+
+        <script src="static/jquery/dist/jquery.js"></script>
+        <script src="http://openlayers.org/en/v3.10.1/build/ol.js" type="text/javascript"></script>
+        <script src="static/vis/dist/vis.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5nwEFQBq9rcJM77FOkfvidu1YbTrKDm8"></script>
+        <script>
+            $(function(){
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat: 0, lng: 0},
+                    zoom: 2
+                });
+
+                $.getJSON("/events", function(res){
+                    // DOM element where the Timeline will be attached
+                    var container = document.getElementById('visualization');
+
+                    var data = [];
+
+                    for( var i = 0; i < res.length; i++ ) {
+                        var de = res[i];
+                        var event = {};
+                        event.id = i;
+                        event.content = de.fields.name;
+                        event.start = new Date( de.fields.year, de.fields.month, de.fields.day );
+                        data.push( event );
+
+                        makeFeature( de.fields.name, de.fields.latitude, de.fields.longitude );
+                    }
+
+                    var items = new vis.DataSet(data);
+
+                    // Configuration for the Timeline
+                    var options = {};
+
+                    // Create a Timeline
+                    var timeline = new vis.Timeline(container, items, options);
+                });
+            });
+
+            function makeFeature( name, lat, lng ) {
+                var marker = new google.maps.Marker({
+                    position: { lat: lat, lng: lng },
+                    map: map,
+                    title: name
+                });
+            }
+        </script>
+    </body>
+</html>
