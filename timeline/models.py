@@ -15,14 +15,17 @@ class Event(models.Model):
 
     type = models.CharField(max_length=2, choices=TYPE_CHOICES, default=SINGLE)
     year = models.IntegerField()
-    month = models.IntegerField()
-    day = models.IntegerField()
+    month = models.IntegerField(default=1)
+    day = models.IntegerField(default=1)
     name = models.TextField()
-    description = models.TextField()
+    description = models.TextField(blank=True)
     location = models.TextField(blank=True)
-    latitude = models.FloatField(blank=True)
-    longitude = models.FloatField(blank=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
     other = models.ForeignKey( 'self', blank=True, null=True )
+
+    def __unicode__(self):
+        return self.name
 
 def geocode( sender, instance, **kwargs ):
     if instance.location:

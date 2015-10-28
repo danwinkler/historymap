@@ -1,0 +1,30 @@
+[
+    {
+        "name": "Life of Muhammad",
+        "year": 570,
+        "location": "Mecca",
+        "other": {
+            "year": 632,
+            "month": 6,
+            "day": 8,
+            "location": "Medina"
+        }
+    },
+    {
+        "name": "Magna Carta",
+        "year": 1215,
+        "location": "Runnymede"
+    },
+    {
+        "name": "Life of Julius Caesar",
+        "year": -100,
+        "month": 7,
+        "day": 13,
+        "location": "Rome",
+        "other": {
+            "year": -44,
+            "month": 3,
+            "day": 15
+        }
+    }
+]

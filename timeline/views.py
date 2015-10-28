@@ -10,4 +10,4 @@ def view( request ):
     return render( request, 'timeline/view.html' )
 
 def events( request ):
-    return HttpResponse( serializers.serialize("json", Event.objects.all()) )
+    return HttpResponse( serializers.serialize("json", Event.objects.all() ) )

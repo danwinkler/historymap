@@ -15,6 +15,8 @@
         <script src="static/vis/dist/vis.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5nwEFQBq9rcJM77FOkfvidu1YbTrKDm8"></script>
         <script>
+            var data = [];
+
             $(function(){
                 map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat: 0, lng: 0},
@@ -25,17 +27,34 @@
                     // DOM element where the Timeline will be attached
                     var container = document.getElementById('visualization');
 
-                    var data = [];
+                    var by_key = {};
+                    for( var i = 0; i < res.length; i++ ) {
+                        by_key[res[i].pk] = res[i];
+                    }
 
                     for( var i = 0; i < res.length; i++ ) {
                         var de = res[i];
+
+                        if( de.fields.type == "SE" ) continue;
+
                         var event = {};
                         event.id = i;
                         event.content = de.fields.name;
                         event.start = new Date( de.fields.year, de.fields.month, de.fields.day );
+
+                        if( de.fields.type == "SS" ) {
+                            var other = by_key[de.fields.other];
+                            event.end = new Date( other.fields.year, other.fields.month, other.fields.day );
+                        }
+
                         data.push( event );
 
-                        makeFeature( de.fields.name, de.fields.latitude, de.fields.longitude );
+                        var marker = new google.maps.Marker({
+                            position: { lat: de.fields.latitude, lng: de.fields.longitude },
+                            map: map,
+                            title: de.fields.name
+                        });
+                        event.marker = marker;
                     }
 
                     var items = new vis.DataSet(data);
@@ -45,15 +64,28 @@
 
                     // Create a Timeline
                     var timeline = new vis.Timeline(container, items, options);
+
+                    timeline.addCustomTime( new Date( 0, 0, 0 ), 'start' );
+
+                    timeline.on('timechanged', function( properties ) {
+                        for( var i = 0; i < data.length; i++ ) {
+                            var d = data[i];
+                            var diff = Math.abs( dateDiffInDays( d.start, properties.time ) );
+                            d.marker.setMap( diff > (365*300) ? null : map );
+                        }
+                        properties.time;
+                    });
                 });
             });
 
-            function makeFeature( name, lat, lng ) {
-                var marker = new google.maps.Marker({
-                    position: { lat: lat, lng: lng },
-                    map: map,
-                    title: name
-                });
+            var _MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+            function dateDiffInDays(a, b) {
+                // Discard the time and time-zone information.
+                var utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+                var utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+                return Math.floor((utc2 - utc1) / _MS_PER_DAY);
             }
         </script>
     </body>

@@ -20,3 +20,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('timeline.urls')),
 ]
+
+from timeline import import_major_events
+
+import_major_events.go()
